@@ -42,10 +42,11 @@
 
         <script>
             const keys = document.querySelectorAll('.key');
+            let audioContext;
 
             keys.forEach(key => {
                 key.addEventListener('click', () => {
-                    const frequency = key.getAttribute('data-frequency');
+                    const frequency = parseFloat(key.getAttribute('data-frequency'));
                     playSound(frequency);
                     key.style.transform = 'scale(0.95)';
                     setTimeout(() => {
@@ -54,14 +55,39 @@
                 });
             });
 
+            function getAudioContext() {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+
+                return audioContext;
+            }
+
             function playSound(frequency) {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
+                const context = getAudioContext();
+                const oscillator = context.createOscillator();
+                const gainNode = context.createGain();
+
                 oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-                oscillator.connect(audioContext.destination);
+                oscillator.frequency.setValueAtTime(frequency, context.currentTime);
+
+                gainNode.gain.setValueAtTime(0, context.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.8, context.currentTime + 0.01);
+                gainNode.gain.linearRampToValueAtTime(0, context.currentTime + 0.5);
+
+                oscillator.connect(gainNode);
+                gainNode.connect(context.destination);
+
                 oscillator.start();
-                oscillator.stop(audioContext.currentTime + 0.5);
+                oscillator.stop(context.currentTime + 0.5);
+                oscillator.addEventListener('ended', () => {
+                    oscillator.disconnect();
+                    gainNode.disconnect();
+                });
             }
         </script>
     <script>window.parent.postMessage({ action: "ready" }, "*"); 
