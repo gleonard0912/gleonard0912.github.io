@@ -8,10 +8,20 @@
         <style>
             body {
                 display: flex;
+                flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                height: 100vh;
+                min-height: 100vh;
+                margin: 0;
                 background-color: #f0f0f0;
+                gap: 2rem;
+            }
+            .message {
+                font-size: clamp(2rem, 8vw, 5rem);
+                font-weight: 800;
+                letter-spacing: 0.05em;
+                color: #1f2937;
+                text-align: center;
             }
             .xylophone {
                 display: flex;
@@ -30,7 +40,8 @@
         </style>
     </head>
     <body>
-        <div class="xylophone">
+        <h1 class="message">testestesters</h1>
+        <div class="xylophone" aria-label="Interactive xylophone">
             <div class="key bg-red-500" data-frequency="261.63"></div>
             <div class="key bg-orange-500" data-frequency="293.66"></div>
             <div class="key bg-yellow-500" data-frequency="329.63"></div>
